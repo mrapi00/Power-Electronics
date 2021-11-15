@@ -214,7 +214,6 @@ public class DiodeRectifier{
         else  
             paraComputeVout();
         
-        
         StdOut.printf("Output DC Voltage: %2.4f volts\n", Vo);
         StdOut.printf("Output DC current: %2.4f volts\n", Io);
     }
