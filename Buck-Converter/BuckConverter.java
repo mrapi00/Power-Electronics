@@ -25,9 +25,9 @@ public class BuckConverter{
     // output resistance
     private final double R;
     // output voltage
-    private double Vo;
+    private final double Vo;
     //output current
-    private double Io;
+    private final double Io;
 
     private BuckConverter(double Vin, double dutyCycle, double L, double C, double R, double f) {
         this.Vin = Vin;
@@ -36,15 +36,17 @@ public class BuckConverter{
         this.C = C;
         this.R = R;
         this.f = f;
+    
+        this.Vo = Vin * dutyCycle;
+        this.Io = Vo / R; // ohm's law
     }
-    // compute and set output voltage with parasitic inductance
-    private double computeVout() {
-        double Vout = 0;
 
-        Vout = Vin * dutyCycle;
-        Vo = Vout;
-        Io = Vo / R; // ohm's law
-        return Vout;
+    private double outputVoltage() {
+        return Vo;
+    }
+
+    private double outputCurrent() {
+        return Io;
     }
 
     private double computeRippleRatio() {
@@ -87,8 +89,8 @@ public class BuckConverter{
         double inputf = StdIn.readDouble();
 
         BuckConverter bc = new BuckConverter(inputVin, inputD, inputL, inputC, inputR, inputf);
-        double Vout = bc.computeVout();
-        double Iout = Vout / inputR;
+        double Vout = bc.outputVoltage();
+        double Iout = bc.outputCurrent();
         double capVolt = bc.capacitorVoltageRipple();
         double indCurr = bc.inductorCurrentRipple();
         double rippleRatio = bc.computeRippleRatio();
@@ -106,9 +108,9 @@ public class BuckConverter{
         else if (rippleRatio > 1 + epsilon) message = "the converter is running in discontinuous conduction mode!";
         else message = "the converter is running in boundary conduction mode!";
         StdOut.println(message);
-        StdOut.println("The MOSFET and diode must be able to block " + inputVin + " volts.");
-        StdOut.println("The MOSFET and diode must be able to carry " + Iout + " amps.");
-
+        
+        StdOut.printf("The MOSFET and diode must be able to block %2.4f volts.\n", inputVin);
+        StdOut.printf("The MOSFET and diode must be able to carry %2.4f amps.\n", Iout);
     }
      
 }
