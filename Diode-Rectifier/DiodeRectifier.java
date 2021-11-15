@@ -1,8 +1,8 @@
 /******************************************************************************
  *  Author: Mahmudul Rapi
  *  Title: Diode Rectifier Circuit Analysis
- *  Compilation:  javac StdIn.java
- *  Execution:    java StdIn   (interactive test of basic functionality)
+ *  Compilation:  javac DiodeRectifier.java
+ *  Execution:    java DiodeRectifier   (interactive test of basic functionality)
  *  Dependencies: StdIn.java, StdOut.java, DisplayImage.java, Diagram Folder
  *
  *  Diode rectifier circuit converts an AC input voltage into a DC output voltage.
@@ -146,8 +146,7 @@ public class DiodeRectifier{
             }
         }
 
-        StdOut.println("Image of Circuit (based on specification) should pop up now!\n");
-        StdOut.println("What is the peak voltage (amplitude of the wave) in volts");
+        StdOut.println("What is the peak voltage (amplitude of the wave) in volts?");
         Vpk = StdIn.readDouble();
         StdOut.println("To confirm, peak voltage of " + Vpk + " volts? 1 for Yes, 2 for No");
             input = StdIn.readInt();
@@ -157,7 +156,7 @@ public class DiodeRectifier{
                 }
 
             while (input == 2){
-                StdOut.println("What is the peak voltage (amplitude of the wave) in volts");
+                StdOut.println("What is the peak voltage (amplitude of the wave) in volts?");
                 Vpk = StdIn.readDouble();
                 StdOut.println("To confirm, peak voltage of " + Vpk + " volts? 1 for Yes, 2 for No");
                 input = StdIn.readInt();
@@ -209,13 +208,21 @@ public class DiodeRectifier{
             }
         }
 
-        if (parasitic == 1)
+        if (parasitic == 2)
             nonParaComputeVout();
         else  
             paraComputeVout();
         
         StdOut.printf("Output DC Voltage: %2.4f volts\n", Vo);
         StdOut.printf("Output DC current: %2.4f volts\n", Io);
+        if (parasitic == 1){
+            double Vstore = Vo;
+            StdOut.println("Without parasitic inductance, quantities would be:");
+            nonParaComputeVout();
+            StdOut.printf("\tOutput DC Voltage: %2.4f volts\n", Vo);
+            StdOut.printf("\tOutput DC current: %2.4f volts\n", Io);
+            StdOut.printf("With commutation, DC output voltage is %2.3f%s of voltage without commutation", Vstore / Vo * 100, "%");
+        }
     }
      
 }
