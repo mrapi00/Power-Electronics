@@ -9,34 +9,54 @@
  *
  ******************************************************************************/
 
+import java.io.IOException;
+
 public class BoostConverter{
     // input DC voltage source
-    private static double Vin;
+    private final double Vin;
     // user input dutyCycle of MOSFET
-    private static double dutyCycle;
-    private static double f;
+    private final double dutyCycle;
+    // switching requency of MOSFET
+    private final double f;
     // inductance of inductor
-    private static double L;
+    private final double L;
     // capacitance of capacitor
-    private static double C;
+    private final double C;
     // output resistance
-    private static double R;
+    private final double R;
     // output voltage
-    private static double Vo;
-    //output current
-    private static double Io;
+    private final double Vo;
+    // output current
+    private final double Io;
+    // input current
+    private final double Iin;
 
-    // compute and set output voltage with parasitic inductance
-    private static double computeVout() {
-        double Vout = 0;
+    private BoostConverter(double Vin, double dutyCycle, double L, double C, double R, double f) {
+        this.Vin = Vin;
+        this.dutyCycle = dutyCycle;
+        this.L = L;
+        this.C = C;
+        this.R = R;
+        this.f = f;
 
-        Vout = Vin * 1/ (1- dutyCycle);
-        Vo = Vout;
-        Io = Vo / R; // ohm's law
-        return Vout;
+        this.Vo = Vin * 1 / (1 - dutyCycle);
+        this.Io = Vo / R;
+        this.Iin = Vo * Io / Vin;
     }
 
-    private static double computeRippleRatio() {
+    private double inputCurrent() {
+        return Iin;
+    }
+
+    private double outputVoltage() {
+        return Vo;
+    }
+
+    private double outputCurrent() {
+        return Io;
+    }
+
+    private double computeRippleRatio() {
         double rippleRatio;
 
         rippleRatio = R * Math.pow((1 - dutyCycle), 2) * dutyCycle / (2 * L * f);
@@ -44,157 +64,62 @@ public class BoostConverter{
         return rippleRatio;
     }
 
+    private double inductorCurrentRipple() {
+        double Iptp;
+        Iptp = Vin * dutyCycle / (L * f);
+        return Iptp;
+    }
+
+    private double capacitorVoltageRipple() {
+        double Vptp;
+
+        Vptp = dutyCycle * Iin * (1 - dutyCycle) / (f * C);
+        return Vptp;
+    }
+
     public static void main(String[] args) throws IOException{
-        
-        StdOut.println("Analysis of the Diode Rectifier Power Electronic Circuit! \n");
-        StdOut.println("Half-wave rectifier (1) or Full-wave recifier (2)? Enter either 1 or 2");
-        int input = StdIn.readInt();
-        while (input != 1 && input != 2){
-            StdOut.println("Please enter 1 or 2");
-            input = StdIn.readInt();
-        }
-        isFullWave = input;
+        StdOut.println("Analysis of the Buck Converter Power Electronic Circuit! \n");
+        DisplayImage image = new DisplayImage("BoostConverterDiagram.png");
+        StdOut.println("What is DC voltage source Vs (in volts)?");
+        double inputVin = StdIn.readDouble();
+        StdOut.println("What is capacitance (in F)?");
+        double inputC = StdIn.readDouble();
+        StdOut.println("What is the inductance (in H)?");
+        double inputL = StdIn.readDouble();
+        StdOut.println("What is the resistance of the output resistor/load (in ohms)?");
+        double inputR = StdIn.readDouble();
+        StdOut.println("What is the duty cycle of the MOSFET (0 < D < 1)?");
+        double inputD = StdIn.readDouble();
+        StdOut.println("What is the switching frequency of the MOSFET in Hz?");
+        double inputf = StdIn.readDouble();
 
-        StdOut.println("Is the voltage waveform a sin wave or square? 1 for sin, 2 for square");
-        input = StdIn.readInt();
-        while (input != 1 && input != 2){
-            StdOut.println("Please enter 1 (sin) or 2 (square)");
-            input = StdIn.readInt();
-        }
-        waveform = input;
-             
-        StdOut.println("Is there any parasitic inductance? 1 for Yes, 2 for No");
-        input = StdIn.readInt();
-        while (input != 1 && input != 2){
-            StdOut.println("Please enter 1 (Yes) or 2 (No)");
-            input = StdIn.readInt();
-        }
-        parasitic = input;
+        BoostConverter bc = new BoostConverter(inputVin, inputD, inputL, inputC, inputR, inputf);
+        double Vout = bc.outputVoltage();
+        double Iout = bc.outputCurrent();
 
-        
-        String im;
-        if (isFullWave == 1)
-            if (parasitic == 1){
-                if (waveform == 1)  im= "Diagram/Half-wave-Rectifier-Sin_Wave.png";
-                else  im = "Diagram/Half-wave-Rectifier-Square-Wave.png";
-            }
-            else {
-                if (waveform == 1) im= "Diagram/Half-wave-Rectifier-Sin_Wave_No_Parasitic.png"; 
-                else  im= "Diagram/Half-wave-Rectifier-Square-Wave_No_Parasitic.png";
-            }
-        else {
-            if (parasitic == 1){
-                if (waveform == 1)  im= "Diagram/full-wave-sin-parasitic.png";
-                else  im= "Diagram/full-wave-square-para.png";
-            }
-            else {
-                if (waveform == 1) im= "Diagram/full-wave-sin-nonpara.png";
-                else  im = "Diagram/full-wave-square-nonpara.png";
-            }
-        }
-        StdOut.println("Diagram of expect circuit should display! (Look at task bar for any blinking application) \n");
-        DisplayImage image = new DisplayImage(im);
-        
+        double capVolt = bc.capacitorVoltageRipple();
+        double indCurr = bc.inductorCurrentRipple();
+        double rippleRatio = bc.computeRippleRatio();
+        StdOut.println("\nEXPECTED VALUES:");
+        StdOut.printf("The DC output voltage is %2.4f volts\n", Vout);
+        StdOut.printf("The DC output current is %2.4f amps\n\n", Iout);
 
-        if (parasitic == 1){
-            StdOut.println("What is the inductance of the parasitic inductor (in H)?");
-            L_c = StdIn.readDouble();
-            StdOut.println("To confirm, parasitic inductance of " + L_c + "H or " + L_c * 1000 + " mH? 1 for Yes, 2 for No");
-            input = StdIn.readInt();
-            while (input != 1 && input != 2){
-                StdOut.println("Please enter 1 (Yes) or 2 (No) ");
-                input = StdIn.readInt();
-                }
+        StdOut.println("Additional Design details:");
+        StdOut.printf("The peak-to-peak inductor current ripple is %2.7f amps\n", indCurr);
+        StdOut.printf("The peak-to-peak capacitor voltage ripple is %2.7f volts\n", capVolt);
+        StdOut.printf("The ripple ratio of the buck converter is %2.5f whichs means ", rippleRatio);
+        String message;
+        double epsilon = 0.0001;
+        if (rippleRatio < 1 - epsilon)
+            message = "the converter is running in continuous conduction mode!";
+        else if (rippleRatio > 1 + epsilon) message = "the converter is running in discontinuous conduction mode!";
+        else message = "the converter is running in boundary conduction mode!";
+        StdOut.println(message);
 
-            while (input == 2){
-                StdOut.println("What is the inductance of the parasitic inductor (in H)?");
-                L_c = StdIn.readDouble();
-                StdOut.println("To confirm, parasitic inductance of " + L_c + "H or " + L_c / 1000 + " mH? 1 for Yes, 2 for No");
-                input = StdIn.readInt();
-                while (input != 1 && input != 2){
-                StdOut.println("Please enter 1 (Yes) or 2 (No) ");
-                input = StdIn.readInt();
-                }
-            }
-        }
+        double Iin = bc.inputCurrent();
+        StdOut.printf("The MOSFET and diode must be able to block %2.4f volts.\n", Vout);
+        StdOut.printf("The MOSFET and diode must be able to carry %2.4f amps.\n", Iin);
 
-        StdOut.println("What is the peak voltage (amplitude of the wave) in volts?");
-        Vpk = StdIn.readDouble();
-        StdOut.println("To confirm, peak voltage of " + Vpk + " volts? 1 for Yes, 2 for No");
-            input = StdIn.readInt();
-            while (input != 1 && input != 2){
-                StdOut.println("Please enter 1 (Yes) or 2 (No) ");
-                input = StdIn.readInt();
-                }
-
-            while (input == 2){
-                StdOut.println("What is the peak voltage (amplitude of the wave) in volts?");
-                Vpk = StdIn.readDouble();
-                StdOut.println("To confirm, peak voltage of " + Vpk + " volts? 1 for Yes, 2 for No");
-                input = StdIn.readInt();
-                while (input != 1 && input != 2){
-                StdOut.println("Please enter 1 (Yes) or 2 (No) ");
-                input = StdIn.readInt();
-                }
-            }
-
-        StdOut.println("What is frequency of the wave in Hz?");
-        double f = StdIn.readDouble();
-        w = f * 2 * Math.PI;
-        StdOut.printf("To confirm, frequency of %3.4f Hz (which is %2.3f rad/s or %2.7fs period)? 1 for Yes, 2 for No\n", f, w, 1 / f);
-        input = StdIn.readInt();
-        while (input != 1 && input != 2){
-            StdOut.println("Please enter 1 (Yes) or 2 (No) ");
-            input = StdIn.readInt();
-            }
-
-        while (input == 2){
-            StdOut.println("What is frequency of the wave in Hz?");
-            f = StdIn.readDouble();
-            w = f * 2 * Math.PI;
-            StdOut.printf("To confirm, frequency of %3.4f Hz (which is %2.4f rad/s or %2.4fs period)? 1 for Yes, 2 for No\n", f, w, 1 / f);
-            input = StdIn.readInt();
-            while (input != 1 && input != 2){
-            StdOut.println("Please enter 1 (Yes) or 2 (No) ");
-            input = StdIn.readInt();
-            }
-        }
-
-        StdOut.println("What is the output resistance (in ohms)?");
-        R = StdIn.readDouble();
-        StdOut.println("To confirm, output resistance of " + R + " ohm? 1 for Yes, 2 for No");
-            input = StdIn.readInt();
-            while (input != 1 && input != 2){
-                StdOut.println("Please enter 1 (Yes) or 2 (No) ");
-                input = StdIn.readInt();
-                }
-
-            while (input == 2){
-                StdOut.println("What is the output resistance in ohms?");
-                R = StdIn.readDouble();
-                StdOut.println("To confirm, output resistance of " + R + " ohm? 1 for Yes, 2 for No");
-                input = StdIn.readInt();
-                while (input != 1 && input != 2){
-                StdOut.println("Please enter 1 (Yes) or 2 (No) ");
-                input = StdIn.readInt();
-            }
-        }
-
-        if (parasitic == 2)
-            nonParaComputeVout();
-        else  
-            paraComputeVout();
-        
-        StdOut.printf("Output DC Voltage: %2.4f volts\n", Vo);
-        StdOut.printf("Output DC current: %2.4f volts\n", Io);
-        if (parasitic == 1){
-            double Vstore = Vo;
-            StdOut.println("Without parasitic inductance, quantities would be:");
-            nonParaComputeVout();
-            StdOut.printf("\tOutput DC Voltage: %2.4f volts\n", Vo);
-            StdOut.printf("\tOutput DC current: %2.4f volts\n", Io);
-            StdOut.printf("With commutation, DC output voltage is %2.3f%s of voltage without commutation", Vstore / Vo * 100, "%");
-        }
     }
      
 }
