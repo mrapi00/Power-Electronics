@@ -5,7 +5,10 @@
  *  Execution:    java BoostConverter   (interactive test of basic functionality)
  *  Dependencies: StdIn.java, StdOut.java, DisplayImage.java, BoostConverterDiagram.png
  *
- *  Buck converter circuit steps down DC input voltage to DC output voltage.
+ *  Buck converter circuit steps up DC input voltage to DC output voltage. 
+ *  User will enter circuit parameters, and the program will compute the
+ *  output voltage and current, along with the ripple across energy storage elements,
+ *  switch limits, and the ripple ratio of the converter. 
  *
  ******************************************************************************/
 
