@@ -72,7 +72,8 @@ public class BuckConverter{
 
     public static void main(String[] args) throws IOException{
         StdOut.println("Analysis of the Buck Converter Power Electronic Circuit! \n");
-        StdOut.println("What is DC voltage source (in volts)?");
+        DisplayImage image = new DisplayImage("BuckConverterDiagram.png");
+        StdOut.println("What is DC voltage source Vs (in volts)?");
         double inputVin = StdIn.readDouble();
         StdOut.println("What is capacitance (in F)?");
         double inputC = StdIn.readDouble();
@@ -80,18 +81,34 @@ public class BuckConverter{
         double inputL = StdIn.readDouble();
         StdOut.println("What is the resistance of the output resistor/load (in ohms)?");
         double inputR = StdIn.readDouble();
-        StdOut.println("What is the duty cycle of the MOSFET (0 < D < 1?");
+        StdOut.println("What is the duty cycle of the MOSFET (0 < D < 1)?");
         double inputD = StdIn.readDouble();
-        StdOut.println("What is the switching frequency of the MOSFET in Hz");
+        StdOut.println("What is the switching frequency of the MOSFET in Hz?");
         double inputf = StdIn.readDouble();
 
         BuckConverter bc = new BuckConverter(inputVin, inputD, inputL, inputC, inputR, inputf);
         double Vout = bc.computeVout();
+        double Iout = Vout / inputR;
         double capVolt = bc.capacitorVoltageRipple();
         double indCurr = bc.inductorCurrentRipple();
         double rippleRatio = bc.computeRippleRatio();
+        StdOut.println("\nEXPECTED VALUES:");
+        StdOut.printf("The DC output voltage is %2.4f volts\n", Vout);
+        StdOut.printf("The DC output current is %2.4f amps\n\n", Iout);
+        StdOut.println("Additional Design details:");
+        StdOut.printf("The peak-to-peak inductor current ripple is %2.7f amps\n", indCurr);
+        StdOut.printf("The peak-to-peak capacitor voltage ripple is %2.7f volts\n", capVolt);
+        StdOut.printf("The ripple ratio of the buck converter is %2.5f whichs means ", rippleRatio);
+        String message;
+        double epsilon = 0.0001;
+        if (rippleRatio < 1 - epsilon)
+            message = "the converter is running in continuous conduction mode!";
+        else if (rippleRatio > 1 + epsilon) message = "the converter is running in discontinuous conduction mode!";
+        else message = "the converter is running in boundary conduction mode!";
+        StdOut.println(message);
+        StdOut.println("The MOSFET and diode must be able to block " + inputVin + " volts.");
+        StdOut.println("The MOSFET and diode must be able to carry " + Iout + " amps.");
 
-        
     }
      
 }
