@@ -90,6 +90,8 @@ public class BuckConverter{
         double capVolt = bc.capacitorVoltageRipple();
         double indCurr = bc.inductorCurrentRipple();
         double rippleRatio = bc.computeRippleRatio();
+
+        
     }
      
 }
