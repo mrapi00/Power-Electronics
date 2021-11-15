@@ -1,11 +1,12 @@
 /******************************************************************************
  *  Author: Mahmudul Rapi
- *  Title: Buck Converter Circuit Analysis
- *  Compilation:  javac BuckConverter.java
- *  Execution:    java BuckConverter   (interactive test of basic functionality)
- *  Dependencies: StdIn.java, StdOut.java, DisplayImage.java, BuckConverterDiagram.png
+ *  Title: Flyback Converter Circuit Analysis
+ *  Compilation:  javac FlybackConverter.java
+ *  Execution:    java FlybackConverter   (interactive test of basic functionality)
+ *  Dependencies: StdIn.java, StdOut.java, DisplayImage.java, FlybackConverterDiagram.png
  *
- *  Buck converter circuit steps down DC input voltage to DC output voltage.
+ *  Flyback converter circuit can step up or down the DC input voltage to DC output voltage
+ *  but with an inverter polarity.
  *  User will enter circuit parameters, and the program will compute the
  *  output voltage and current, along with the ripple across energy storage elements,
  *  switch limits, and the ripple ratio of the converter.
@@ -14,7 +15,7 @@
 
 import java.io.IOException;
 
-public class BuckConverter{
+public class FlybackConverter{
     // input DC voltage source
     private final double Vin;
     // user input dutyCycle of MOSFET
@@ -32,7 +33,7 @@ public class BuckConverter{
     //output current
     private final double Io;
 
-    private BuckConverter(double Vin, double dutyCycle, double L, double C, double R, double f) {
+    private FlybackConverter(double Vin, double dutyCycle, double L, double C, double R, double f) {
         this.Vin = Vin;
         this.dutyCycle = dutyCycle;
         this.L = L;
@@ -76,8 +77,8 @@ public class BuckConverter{
     }
 
     public static void main(String[] args) throws IOException{
-        StdOut.println("Analysis of the Buck Converter Power Electronic Circuit! \n");
-        DisplayImage image = new DisplayImage("BuckConverterDiagram.png");
+        StdOut.println("Analysis of the Flyback Converter Power Electronic Circuit! \n");
+        DisplayImage image = new DisplayImage("FlybackConverterDiagram.png");
         StdOut.println("What is DC voltage source Vs (in volts)?");
         double inputVin = StdIn.readDouble();
         StdOut.println("What is capacitance (in F)?");
@@ -91,12 +92,12 @@ public class BuckConverter{
         StdOut.println("What is the switching frequency of the MOSFET in Hz?");
         double inputf = StdIn.readDouble();
 
-        BuckConverter bc = new BuckConverter(inputVin, inputD, inputL, inputC, inputR, inputf);
-        double Vout = bc.outputVoltage();
-        double Iout = bc.outputCurrent();
-        double capVolt = bc.capacitorVoltageRipple();
-        double indCurr = bc.inductorCurrentRipple();
-        double rippleRatio = bc.computeRippleRatio();
+        FlybackConverter fbc = new FlybackConverter(inputVin, inputD, inputL, inputC, inputR, inputf);
+        double Vout = fbc.outputVoltage();
+        double Iout = fbc.outputCurrent();
+        double capVolt = fbc.capacitorVoltageRipple();
+        double indCurr = fbc.inductorCurrentRipple();
+        double rippleRatio = fbc.computeRippleRatio();
         StdOut.println("\nEXPECTED VALUES:");
         StdOut.printf("The DC output voltage is %2.4f volts\n", Vout);
         StdOut.printf("The DC output current is %2.4f amps\n\n", Iout);
