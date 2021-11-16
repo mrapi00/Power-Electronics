@@ -6,7 +6,7 @@
  *  Dependencies: StdIn.java, StdOut.java, DisplayImage.java, FlybackConverterDiagram.png
  *
  *  Flyback converter circuit can step up or down the DC input voltage to DC output voltage
- *  but with an inverter polarity.
+ *  but with an inverted polarity.
  *  User will enter circuit parameters, and the program will compute the
  *  output voltage and current, along with the ripple across energy storage elements,
  *  switch limits, and the ripple ratio of the converter.
@@ -32,6 +32,8 @@ public class FlybackConverter{
     private final double Vo;
     //output current
     private final double Io;
+    // input current
+    private final double Iin;
 
     private FlybackConverter(double Vin, double dutyCycle, double L, double C, double R, double f) {
         this.Vin = Vin;
@@ -41,8 +43,13 @@ public class FlybackConverter{
         this.R = R;
         this.f = f;
     
-        this.Vo = Vin * dutyCycle;
+        this.Vo = dutyCycle / (dutyCycle - 1) * Vin;
         this.Io = Vo / R; // ohm's law
+        this.Iin = Vo * Io / Vin;
+    }
+
+    private double inputCurrent() {
+        return Iin;
     }
 
     private double outputVoltage() {
@@ -113,8 +120,9 @@ public class FlybackConverter{
         else message = "the converter is running in boundary conduction mode!";
         StdOut.println(message);
         
-        StdOut.printf("The MOSFET and diode must be able to block %2.4f volts.\n", inputVin);
-        StdOut.printf("The MOSFET and diode must be able to carry %2.4f amps.\n", Iout);
+        double Iin = fbc.inputCurrent();
+        StdOut.printf("The MOSFET and diode must be able to block %2.4f volts.\n", inputVin + (Vout * -1));
+        StdOut.printf("The MOSFET and diode must be able to carry %2.4f amps.\n", -Iout + Iin);
     }
      
 }
