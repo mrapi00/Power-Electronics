@@ -29,6 +29,7 @@ public class FlybackConverter{
     // input current
     private final double Iin;
 
+    // constructor which initalizes all values based on given data
     private FlybackConverter(double Vin, double dutyCycle, double R) {
         this.Vin = Vin;
         this.dutyCycle = dutyCycle;
@@ -39,14 +40,17 @@ public class FlybackConverter{
         this.Iin = Vo * Io / Vin;
     }
 
+    // returns input current
     private double inputCurrent() {
         return Iin;
     }
 
+    // returns output voltage
     private double outputVoltage() {
         return Vo;
     }
 
+    // returns output current
     private double outputCurrent() {
         return Io;
     }

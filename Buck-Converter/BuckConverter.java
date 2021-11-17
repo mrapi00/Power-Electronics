@@ -32,6 +32,7 @@ public class BuckConverter{
     //output current
     private final double Io;
 
+    // constructor which initalizes all values based on given data
     private BuckConverter(double Vin, double dutyCycle, double L, double C, double R, double f) {
         this.Vin = Vin;
         this.dutyCycle = dutyCycle;
@@ -44,14 +45,17 @@ public class BuckConverter{
         this.Io = Vo / R; // ohm's law
     }
 
+    // returns output voltage
     private double outputVoltage() {
         return Vo;
     }
 
+    // returns output current
     private double outputCurrent() {
         return Io;
     }
 
+    // computes ripple ratio (which determins the conduction mode of the converter)
     private double computeRippleRatio() {
         double rippleRatio;
 
@@ -60,12 +64,14 @@ public class BuckConverter{
         return rippleRatio;
     }
 
+    // computes the ripple peak to peak current through the inductor
     private double inductorCurrentRipple() {
         double Iptp;
         Iptp = Vo * (1 - dutyCycle) / (L * f);
         return Iptp;
     }
 
+    // computes the ripple peak to peak voltage across the capacitor
     private double capacitorVoltageRipple() {
         double Vptp;
         double Ip2p = inductorCurrentRipple();

@@ -1,6 +1,6 @@
 /******************************************************************************
  *  Author: Mahmudul Rapi
- *  Title: Boost Conerter Circuit Analysis
+ *  Title: Boost Converter Circuit Analysis
  *  Compilation:  javac BoostConverter.java
  *  Execution:    java BoostConverter   (interactive test of basic functionality)
  *  Dependencies: StdIn.java, StdOut.java, DisplayImage.java, BoostConverterDiagram.png
@@ -33,7 +33,8 @@ public class BoostConverter{
     private final double Io;
     // input current
     private final double Iin;
-
+    
+    // constructor which initalizes all values based on given data
     private BoostConverter(double Vin, double dutyCycle, double L, double C, double R, double f) {
         this.Vin = Vin;
         this.dutyCycle = dutyCycle;
@@ -47,18 +48,22 @@ public class BoostConverter{
         this.Iin = Vo * Io / Vin;
     }
 
+    // returns input current
     private double inputCurrent() {
         return Iin;
     }
 
+    // returns output voltage
     private double outputVoltage() {
         return Vo;
     }
 
+    // returns output current
     private double outputCurrent() {
         return Io;
     }
 
+    // computes ripple ratio (which determins the conduction mode of the converter)
     private double computeRippleRatio() {
         double rippleRatio;
 
@@ -67,12 +72,14 @@ public class BoostConverter{
         return rippleRatio;
     }
 
+    // computes the ripple peak to peak current through the inductor
     private double inductorCurrentRipple() {
         double Iptp;
         Iptp = Vin * dutyCycle / (L * f);
         return Iptp;
     }
 
+    // computes the ripple peak to peak voltage across the capacitor
     private double capacitorVoltageRipple() {
         double Vptp;
 
