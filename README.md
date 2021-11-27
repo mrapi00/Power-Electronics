@@ -1,4 +1,4 @@
-# Power-Electronics
+# Power-Electronics-Library
 
 Author: Mahmudul Rapi
 
