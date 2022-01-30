@@ -1,8 +1,6 @@
 # Power-Electronics-Library
 
-Author: Mahmudul Rapi
-
-My power electronics library containing various power electronic topologies (diode-rectifier, buck converter, boost converter, flyback converter), user-interactive to ask for circuit parameters, and computes the output current and output voltage, and ripple inductor current, ripple capacitor voltage, and peak switch voltage/currents (for design choice).
+A power electronics library containing various power electronic topologies (diode-rectifier, buck converter, boost converter, flyback converter), user-interactive to ask for circuit parameters, and computes the output current and output voltage, and ripple inductor current, ripple capacitor voltage, and peak switch voltage/currents (for design choice).
 
 A **diode rectifier** is a AC-to-DC power converter. Implements a inductive filter for cleaner and flatter DC output voltage.
 A **buck converter** (step-down converter) is a DC-to-DC power converter which steps down voltage from its input (supply) to its output (load).
